@@ -1,0 +1,28 @@
+import type { AppSettings } from '../services/settingsService'
+
+export const DEFAULT_APP_SETTINGS: AppSettings = {
+  companyName: 'Global Supply Ltd',
+  legalEntityName: 'Global Supply Limited',
+  siteName: 'HQ Operations',
+  taxId: '27AABCG1234F1Z5',
+  currency: 'INR',
+  timezone: 'Asia/Kolkata',
+  dateFormat: 'DD/MM/YYYY',
+  fiscalYearStartMonth: 'April',
+  supportEmail: 'ops@globalsupply.com',
+  phone: '+91-22-4000-1200',
+  website: 'https://globalsupply.com',
+  addressLine: '501 Trade Tower, Bandra Kurla Complex',
+  addressCity: 'Mumbai',
+  addressCountry: 'India',
+  notifyLowStock: true,
+  notifyApprovals: true,
+  notifyNewOrders: true,
+  notifyOverdueInvoices: true,
+  sessionUserName: 'Alex Mercer',
+  sessionUserRole: 'Lead Controller',
+  reportingMonthLabel: 'September 2026',
+  requireStrongPassword: true,
+  sessionTimeoutMinutes: 480,
+  maintenanceMode: false,
+}

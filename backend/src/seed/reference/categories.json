@@ -1,0 +1,11 @@
+[
+  { "id": "CAT-001", "name": "Electronics" },
+  { "id": "CAT-002", "name": "Office Supplies" },
+  { "id": "CAT-003", "name": "Warehouse Equipment" },
+  { "id": "CAT-004", "name": "IT Equipment" },
+  { "id": "CAT-005", "name": "Furniture" },
+  { "id": "CAT-006", "name": "Packaging" },
+  { "id": "CAT-007", "name": "Safety Equipment" },
+  { "id": "CAT-008", "name": "Consumables" },
+  { "id": "CAT-009", "name": "Industrial Equipment" }
+]

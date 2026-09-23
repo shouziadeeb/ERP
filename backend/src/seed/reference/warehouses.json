@@ -1,0 +1,7 @@
+[
+  { "id": "WH-001", "name": "Delhi Central Warehouse", "city": "New Delhi", "country": "India" },
+  { "id": "WH-002", "name": "Mumbai Warehouse", "city": "Mumbai", "country": "India" },
+  { "id": "WH-003", "name": "Bangalore Warehouse", "city": "Bangalore", "country": "India" },
+  { "id": "WH-004", "name": "Hyderabad Warehouse", "city": "Hyderabad", "country": "India" },
+  { "id": "WH-005", "name": "Dubai Warehouse", "city": "Dubai", "country": "UAE" }
+]

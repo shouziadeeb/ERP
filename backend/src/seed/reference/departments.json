@@ -1,0 +1,13 @@
+[
+  { "id": "DEP-001", "name": "Engineering", "code": "ENG" },
+  { "id": "DEP-002", "name": "Human Resources", "code": "HR" },
+  { "id": "DEP-003", "name": "Finance", "code": "FIN" },
+  { "id": "DEP-004", "name": "Sales", "code": "SLS" },
+  { "id": "DEP-005", "name": "Marketing", "code": "MKT" },
+  { "id": "DEP-006", "name": "Operations", "code": "OPS" },
+  { "id": "DEP-007", "name": "Procurement", "code": "PRC" },
+  { "id": "DEP-008", "name": "Warehouse", "code": "WHS" },
+  { "id": "DEP-009", "name": "Customer Support", "code": "CS" },
+  { "id": "DEP-010", "name": "IT", "code": "IT" },
+  { "id": "DEP-011", "name": "Administration", "code": "ADM" }
+]
