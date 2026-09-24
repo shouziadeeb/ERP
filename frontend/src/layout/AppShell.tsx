@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Icon } from '../components/Icon'
+import { LogoutConfirmModal } from '../components/ui/LogoutConfirmModal'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { getNavStats } from '../services/navService'
 import { globalSearch, type SearchHit } from '../services/searchService'
@@ -26,6 +27,7 @@ export function AppShell({ children, onLogout }: AppShellProps) {
   const debouncedSearch = useDebouncedValue(search, 300)
   const [searchHits, setSearchHits] = useState<SearchHit[]>([])
   const [searchOpen, setSearchOpen] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   const navItems = [
     { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -187,7 +189,7 @@ export function AppShell({ children, onLogout }: AppShellProps) {
             </div>
             <button
               type="button"
-              onClick={onLogout}
+              onClick={() => setLogoutConfirmOpen(true)}
               className={`font-semibold text-primary hover:underline ${collapsed ? 'w-8 h-8 rounded-lg hover:bg-surface-container-low flex items-center justify-center hover:no-underline' : 'text-[11px] px-1'}`}
               title="Sign out"
             >
@@ -264,6 +266,15 @@ export function AppShell({ children, onLogout }: AppShellProps) {
 
         <main className="w-full pt-14 bg-background min-h-screen">{children}</main>
       </div>
+
+      <LogoutConfirmModal
+        open={logoutConfirmOpen}
+        onCancel={() => setLogoutConfirmOpen(false)}
+        onConfirm={() => {
+          setLogoutConfirmOpen(false)
+          onLogout()
+        }}
+      />
     </div>
   )
 }
