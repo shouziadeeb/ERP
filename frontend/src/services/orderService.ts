@@ -1,3 +1,4 @@
+/** Sales orders: list, detail, create, status and payment updates. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { SortOrder } from '../types/pagination'
 import type { OrderStatus, PaymentStatus, SalesOrder } from '../types/order'

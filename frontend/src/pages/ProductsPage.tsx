@@ -1,3 +1,4 @@
+/** Product catalog list with create/edit drawer (POST/PATCH API). */
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { ProductFormDrawer, type ProductFormState } from '../components/products/ProductFormDrawer'
 import { Icon } from '../components/Icon'

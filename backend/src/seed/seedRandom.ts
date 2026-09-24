@@ -1,3 +1,4 @@
+/** Deterministic PRNG helpers so seed data is stable across runs. */
 export type SeededRandom = () => number
 
 export function createSeededRandom(seed: number): SeededRandom {

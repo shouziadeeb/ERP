@@ -1,3 +1,4 @@
+/** Dashboard widgets: summary, charts, approvals, low stock, activities. */
 import { fetchJson } from '../lib/http'
 import type {
   DashboardActivity,

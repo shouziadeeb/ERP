@@ -1,3 +1,4 @@
+/** Invoice list and detail from /api/invoices. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { Invoice } from '../types/invoice'
 

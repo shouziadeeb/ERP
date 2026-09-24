@@ -1,3 +1,4 @@
+/** Accounts receivable invoice list and detail drawer. */
 import { useCallback, useEffect, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { EmptyState } from '../components/ui/EmptyState'

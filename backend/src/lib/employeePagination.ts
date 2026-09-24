@@ -1,6 +1,10 @@
-import { and, asc, desc, eq, ilike, or, sql, type AnyColumn, type SQL } from 'drizzle-orm'
-import { db } from '../db/index.js'
-import { employees } from '../db/schema.js'
+/**
+ * Employee directory list: server-side search, filters, sort, count + page query.
+ * Designed for large tables (100k+ rows) with indexed columns.
+ */
+import type { Employee, Prisma } from '@prisma/client'
+import { prisma } from '../db/index.js'
+import { toDateOnlyString } from './dates.js'
 
 export interface EmployeeListQuery {
   page?: number
@@ -13,8 +17,11 @@ export interface EmployeeListQuery {
   sortOrder?: 'asc' | 'desc'
 }
 
+/** API serializes `joiningDate` as YYYY-MM-DD strings (Postgres `@db.Date` is a Date in Prisma). */
+export type EmployeeListRow = Omit<Employee, 'joiningDate'> & { joiningDate: string }
+
 export interface EmployeeListPage {
-  data: Array<typeof employees.$inferSelect & { joiningDate: string }>
+  data: EmployeeListRow[]
   pagination: {
     page: number
     limit: number
@@ -23,73 +30,71 @@ export interface EmployeeListPage {
   }
 }
 
-function parseSort(sortBy: string, sortOrder: string): { column: AnyColumn; isAsc: boolean } {
-  const isAsc = sortOrder !== 'desc'
+/** Maps API sort fields to Prisma `orderBy` (secondary sort on id keeps pages stable). */
+function parseOrderBy(sortBy: string, sortOrder: string): Prisma.EmployeeOrderByWithRelationInput[] {
+  const dir = sortOrder === 'desc' ? 'desc' : 'asc'
   switch (sortBy) {
     case 'employeeCode':
-      return { column: employees.employeeCode, isAsc }
+      return [{ employeeCode: dir }, { id: 'asc' }]
     case 'joiningDate':
-      return { column: employees.joiningDate, isAsc }
+      return [{ joiningDate: dir }, { id: 'asc' }]
     case 'id':
-      return { column: employees.id, isAsc }
+      return [{ id: dir }]
     default:
-      return { column: employees.fullName, isAsc }
+      return [{ fullName: dir }, { id: 'asc' }]
   }
 }
 
-function buildFilters(query: EmployeeListQuery): SQL | undefined {
+/** Builds a Prisma `where` clause; empty object means no filters. */
+function buildFilters(query: EmployeeListQuery): Prisma.EmployeeWhereInput {
   const search = String(query.search ?? '').trim()
   const departmentId = String(query.departmentId ?? 'all')
   const status = String(query.status ?? 'all')
   const country = String(query.country ?? 'all')
 
-  const filters: SQL[] = []
+  const and: Prisma.EmployeeWhereInput[] = []
   if (search) {
-    filters.push(
-      or(
-        ilike(employees.fullName, `%${search}%`),
-        ilike(employees.id, `%${search}%`),
-        ilike(employees.employeeCode, `%${search}%`),
-        ilike(employees.email, `%${search}%`),
-        ilike(employees.departmentName, `%${search}%`),
-        ilike(employees.designation, `%${search}%`),
-      )!,
-    )
+    and.push({
+      OR: [
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { id: { contains: search, mode: 'insensitive' } },
+        { employeeCode: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { departmentName: { contains: search, mode: 'insensitive' } },
+        { designation: { contains: search, mode: 'insensitive' } },
+      ],
+    })
   }
-  if (departmentId !== 'all') filters.push(eq(employees.departmentId, departmentId))
-  if (status !== 'all') filters.push(eq(employees.status, status))
-  if (country !== 'all') filters.push(eq(employees.country, country))
+  if (departmentId !== 'all') and.push({ departmentId })
+  if (status !== 'all') and.push({ status })
+  if (country !== 'all') and.push({ country })
 
-  return filters.length ? and(...filters) : undefined
+  return and.length ? { AND: and } : {}
 }
 
 export async function listEmployees(query: EmployeeListQuery): Promise<EmployeeListPage> {
   const limit = Math.max(1, Math.min(100, Number(query.limit) || 25))
   const page = Math.max(1, Number(query.page) || 1)
   const offset = (page - 1) * limit
-  const whereBase = buildFilters(query)
-  const { column: sortCol, isAsc } = parseSort(String(query.sortBy ?? 'fullName'), String(query.sortOrder ?? 'asc'))
-  const order = isAsc ? [asc(sortCol), asc(employees.id)] : [desc(sortCol), desc(employees.id)]
+  const where = buildFilters(query)
+  const orderBy = parseOrderBy(String(query.sortBy ?? 'fullName'), String(query.sortOrder ?? 'asc'))
 
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(employees)
-    .where(whereBase)
+  const count = await prisma.employee.count({ where })
 
   const totalPages = Math.max(1, Math.ceil(count / limit))
+  // If client asks for page 9999 after filters shrink, clamp instead of returning empty by mistake.
   const safePage = Math.min(page, totalPages)
   const safeOffset = (safePage - 1) * limit
 
-  const rows = await db
-    .select()
-    .from(employees)
-    .where(whereBase)
-    .orderBy(...order)
-    .limit(limit)
-    .offset(safeOffset)
+  const rows = await prisma.employee.findMany({
+    where,
+    orderBy,
+    take: limit,
+    skip: safeOffset,
+  })
 
   return {
-    data: rows.map((row) => ({ ...row, joiningDate: String(row.joiningDate) })),
+    data: rows.map((row) => ({ ...row, joiningDate: toDateOnlyString(row.joiningDate) })),
     pagination: {
       page: safePage,
       limit,

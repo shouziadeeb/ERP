@@ -1,6 +1,5 @@
-import { eq } from 'drizzle-orm'
-import { db } from '../db/index.js'
-import { appMeta } from '../db/schema.js'
+/** Organization settings stored as key/value rows in app_meta (merged with defaults on read). */
+import { prisma } from '../db/index.js'
 
 export const DEFAULT_SETTINGS = {
   companyName: 'Global Supply Ltd',
@@ -54,7 +53,7 @@ function parseValue(key: keyof AppSettings, raw: string): AppSettings[keyof AppS
 }
 
 export async function readSettings(): Promise<SettingsResponse> {
-  const rows = await db.select().from(appMeta)
+  const rows = await prisma.appMeta.findMany()
   const map = new Map(rows.map((r) => [r.key, r.value]))
   const out = { ...DEFAULT_SETTINGS }
 
@@ -70,27 +69,37 @@ export async function readSettings(): Promise<SettingsResponse> {
   }
 }
 
+/** Upsert each changed key; Prisma `upsert` is one round-trip per key (same pattern as before). */
 export async function saveSettings(patch: Partial<AppSettings>): Promise<SettingsResponse> {
   const allowed = patch as Record<string, unknown>
   for (const key of Object.keys(DEFAULT_SETTINGS)) {
     if (allowed[key] === undefined) continue
     const value = allowed[key]
     const text = typeof value === 'boolean' || typeof value === 'number' ? String(value) : String(value)
-    await db
-      .insert(appMeta)
-      .values({ key, value: text })
-      .onConflictDoUpdate({ target: appMeta.key, set: { value: text } })
+    await prisma.appMeta.upsert({
+      where: { key },
+      create: { key, value: text },
+      update: { value: text },
+    })
   }
 
   const now = new Date().toISOString()
   const by = String(patch.sessionUserName ?? 'System Admin')
-  await db.insert(appMeta).values({ key: 'settingsUpdatedAt', value: now }).onConflictDoUpdate({ target: appMeta.key, set: { value: now } })
-  await db.insert(appMeta).values({ key: 'settingsUpdatedBy', value: by }).onConflictDoUpdate({ target: appMeta.key, set: { value: by } })
+  await prisma.appMeta.upsert({
+    where: { key: 'settingsUpdatedAt' },
+    create: { key: 'settingsUpdatedAt', value: now },
+    update: { value: now },
+  })
+  await prisma.appMeta.upsert({
+    where: { key: 'settingsUpdatedBy' },
+    create: { key: 'settingsUpdatedBy', value: by },
+    update: { value: by },
+  })
 
   return readSettings()
 }
 
 export async function getMeta(key: string): Promise<string | null> {
-  const [row] = await db.select().from(appMeta).where(eq(appMeta.key, key))
+  const row = await prisma.appMeta.findUnique({ where: { key } })
   return row?.value ?? null
 }

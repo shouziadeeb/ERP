@@ -1,3 +1,4 @@
+/** Paginated /api/reports by type with optional full export. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { SortOrder } from '../types/pagination'
 

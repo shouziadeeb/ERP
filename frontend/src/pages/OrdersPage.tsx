@@ -1,3 +1,4 @@
+/** Sales orders: filters, create order with line items, status and payment updates. */
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Icon } from '../components/Icon'
 import { EmptyState } from '../components/ui/EmptyState'

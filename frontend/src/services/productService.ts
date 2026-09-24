@@ -1,3 +1,4 @@
+/** Product catalog CRUD against /api/products. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { SortOrder } from '../types/pagination'
 import type { Product, ProductCategory } from '../types/product'

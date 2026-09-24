@@ -1,3 +1,4 @@
+/** Read-only procurement PO list and detail (data from GET /api/purchase-orders). */
 import { useCallback, useEffect, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { EmptyState } from '../components/ui/EmptyState'

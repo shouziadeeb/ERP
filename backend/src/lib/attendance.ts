@@ -1,3 +1,7 @@
+/**
+ * Generates a month of attendance rows for employee detail UI.
+ * Uses a seeded PRNG so the same employee always gets the same pattern (no DB table).
+ */
 type AttendanceStatus =
   | 'Present'
   | 'Absent'

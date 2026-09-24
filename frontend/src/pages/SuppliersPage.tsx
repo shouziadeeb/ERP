@@ -1,3 +1,4 @@
+/** Supplier master data: search, pagination, create supplier form. */
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorBanner } from '../components/ui/ErrorBanner'

@@ -6,23 +6,23 @@
   "scripts": {
     "dev": "PORT=3010 tsx watch src/index.ts",
     "start": "PORT=3010 tsx src/index.ts",
-    "db:push": "drizzle-kit push",
+    "postinstall": "prisma generate",
+    "db:generate": "tsx scripts/with-env.ts generate",
+    "db:push": "tsx scripts/with-env.ts db push",
     "db:seed": "tsx scripts/seed.ts",
     "db:setup": "npm run db:push && npm run db:seed"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
-    "drizzle-orm": "^0.44.5",
-    "express": "^5.1.0",
-    "pg": "^8.16.3"
+    "express": "^5.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.13.3",
-    "@types/pg": "^8.15.5",
-    "drizzle-kit": "^0.31.4",
+    "prisma": "^6.16.2",
     "tsx": "^4.20.5",
     "typescript": "~6.0.2"
   }

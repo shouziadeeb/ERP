@@ -1,3 +1,4 @@
+/** Leave request create and approve/reject PATCH. */
 import { fetchJson } from '../lib/http'
 
 export async function updateLeaveStatus(id: string, status: 'Approved' | 'Rejected', approvedBy?: string) {

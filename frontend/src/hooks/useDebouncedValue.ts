@@ -1,3 +1,4 @@
+/** Delays updating output until the user pauses typing (reduces API calls on search fields). */
 import { useEffect, useState } from 'react'
 
 export function useDebouncedValue<T>(value: T, delayMs = 300): T {

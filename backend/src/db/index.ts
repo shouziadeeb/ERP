@@ -1,15 +1,20 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import pg from 'pg'
-import * as schema from './schema.js'
+/**
+ * Single Prisma Client for the whole API.
+ *
+ * Prisma opens a connection pool using DATABASE_URL (set in repo root `.env.local` for Neon).
+ * In development, tsx watch reloads this module often; storing the client on `globalThis`
+ * prevents "too many connections" errors from creating a new pool on every reload.
+ */
+import { PrismaClient } from '@prisma/client'
 
-const connectionString = process.env.DATABASE_URL
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not set. Link Neon and pull .env.local at the repo root.')
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  })
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
 }
-
-export const pool = new pg.Pool({
-  connectionString,
-  ssl: connectionString.includes('neon.tech') ? { rejectUnauthorized: false } : undefined,
-})
-
-export const db = drizzle(pool, { schema })

@@ -1,3 +1,6 @@
+/**
+ * Login API with retries for slow/cold backends (does not use fetchJson — avoids 401 redirect loop).
+ */
 import { apiUrl } from '../config/api'
 import { ApiError } from '../lib/http'
 
@@ -27,6 +30,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/** Retry network/5xx errors; never retry wrong password (401). */
 function shouldRetryLogin(error: unknown, attemptIndex: number): boolean {
   if (attemptIndex >= MAX_ATTEMPTS - 1) return false
   if (error instanceof ApiError) {

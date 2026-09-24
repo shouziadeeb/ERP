@@ -1,3 +1,4 @@
+/** Small pure functions shared by inventory write routes and seed logic. */
 export function calcAvailable(quantity: number, reserved: number): number {
   return Math.max(0, quantity - reserved)
 }

@@ -1,3 +1,6 @@
+/**
+ * Root app: login gate via sessionStorage, lazy-loaded ERP pages, shared AppShell layout.
+ */
 import { lazy, Suspense, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AUTH_STORAGE_KEY, AUTH_TOKEN_KEY } from './constants/auth'
@@ -57,6 +60,7 @@ function App() {
     setAuthed(false)
   }
 
+  // Not logged in → only login screen (no sidebar routes).
   if (!authed) {
     return <LoginPage onSuccess={handleLoginSuccess} />
   }

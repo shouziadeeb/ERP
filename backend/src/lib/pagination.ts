@@ -1,3 +1,4 @@
+/** Standard offset pagination used by most list endpoints (not employees — see employeePagination). */
 export function parsePagination(query: Record<string, unknown>) {
   const page = Math.max(1, Number(query.page) || 1)
   const limit = Math.max(1, Math.min(100, Number(query.limit) || 25))

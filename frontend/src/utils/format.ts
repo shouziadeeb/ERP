@@ -1,3 +1,4 @@
+/** INR and date formatting for tables and dashboard cards. */
 export function formatCurrencyInr(value: number): string {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',

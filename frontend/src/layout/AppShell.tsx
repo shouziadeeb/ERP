@@ -1,3 +1,6 @@
+/**
+ * Authenticated layout: collapsible sidebar, global search, nav badges, logout confirm modal.
+ */
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'

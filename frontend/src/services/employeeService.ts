@@ -1,3 +1,4 @@
+/** Employee directory and HR detail API client. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { AttendanceRecord } from '../types/attendance'
 import type { Department, Employee } from '../types/employee'

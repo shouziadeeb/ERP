@@ -1,0 +1,292 @@
+/**
+ * Prisma schema for ApexERP (Postgres on Neon).
+ * Models use camelCase in TypeScript; @@map / @map keep existing snake_case table/column names
+ * so this matches the database created by the previous Drizzle setup.
+ *
+ * Workflow:
+ *   npx prisma db push   — apply schema changes to the database (npm run db:push)
+ *   npx prisma generate  — regenerate @prisma/client types after edits (runs on npm install)
+ */
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id        String     @id
+  name      String
+  code      String
+  employees Employee[]
+
+  @@map("departments")
+}
+
+model ProductCategory {
+  id       String    @id
+  name     String
+  products Product[]
+
+  @@map("product_categories")
+}
+
+model Warehouse {
+  id               String            @id
+  name             String
+  city             String
+  country          String
+  inventoryRecords InventoryRecord[]
+
+  @@map("warehouses")
+}
+
+model Supplier {
+  id             String          @id
+  supplierCode   String          @map("supplier_code")
+  companyName    String          @map("company_name")
+  contactPerson  String          @map("contact_person")
+  email          String
+  phone          String
+  country        String
+  city           String
+  status         String
+  paymentTerms   String          @map("payment_terms")
+  products       Product[]
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model Customer {
+  id            String       @id
+  customerCode  String       @map("customer_code")
+  companyName   String       @map("company_name")
+  contactPerson String       @map("contact_person")
+  email         String
+  phone         String
+  country       String
+  city          String
+  status        String
+  creditLimit   Int          @map("credit_limit")
+  paymentTerms  String       @map("payment_terms")
+  salesOrders   SalesOrder[]
+  invoices      Invoice[]
+
+  @@map("customers")
+}
+
+model Product {
+  id                 String              @id
+  sku                String
+  name               String
+  categoryId         String              @map("category_id")
+  categoryName       String              @map("category_name")
+  brand              String
+  unit               String
+  costPrice          Float               @map("cost_price")
+  sellingPrice       Float               @map("selling_price")
+  taxRate            Float               @map("tax_rate")
+  status             String
+  supplierId         String              @map("supplier_id")
+  reorderLevel       Int                 @map("reorder_level")
+  category           ProductCategory     @relation(fields: [categoryId], references: [id])
+  supplier           Supplier            @relation(fields: [supplierId], references: [id])
+  inventoryRecords   InventoryRecord[]
+  salesOrderItems    SalesOrderItem[]
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@map("products")
+}
+
+/// Employee directory; indexes support filter/sort at 100k+ row scale.
+model Employee {
+  id             String          @id
+  employeeCode   String          @map("employee_code")
+  firstName      String          @map("first_name")
+  lastName       String          @map("last_name")
+  fullName       String          @map("full_name")
+  email          String
+  phone          String
+  country        String
+  city           String
+  departmentId   String          @map("department_id")
+  departmentName String          @map("department_name")
+  designationId  String          @map("designation_id")
+  designation    String
+  managerId      String?         @map("manager_id")
+  employmentType String          @map("employment_type")
+  joiningDate    DateTime        @map("joining_date") @db.Date
+  status         String
+  skills         Json
+  avatar         String?
+  department     Department      @relation(fields: [departmentId], references: [id])
+  leaveRequests  LeaveRequest[]
+  payrollRecords PayrollRecord[]
+
+  @@index([fullName, id], map: "employees_full_name_id_idx")
+  @@index([employeeCode], map: "employees_employee_code_idx")
+  @@index([departmentId], map: "employees_department_id_idx")
+  @@index([status], map: "employees_status_idx")
+  @@index([country], map: "employees_country_idx")
+  @@index([joiningDate, id], map: "employees_joining_date_id_idx")
+  @@map("employees")
+}
+
+model InventoryRecord {
+  id                String    @id
+  productId         String    @map("product_id")
+  sku               String
+  productName       String    @map("product_name")
+  warehouseId       String    @map("warehouse_id")
+  warehouseName     String    @map("warehouse_name")
+  quantity          Int
+  reservedQuantity  Int       @map("reserved_quantity")
+  availableQuantity Int       @map("available_quantity")
+  reorderLevel      Int       @map("reorder_level")
+  status            String
+  lastUpdated       DateTime  @map("last_updated") @db.Timestamptz(6)
+  product           Product   @relation(fields: [productId], references: [id])
+  warehouse         Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@map("inventory_records")
+}
+
+model SalesOrder {
+  id            String           @id
+  orderNumber   String           @map("order_number")
+  customerId    String           @map("customer_id")
+  customerName  String           @map("customer_name")
+  orderDate     DateTime         @map("order_date") @db.Date
+  status        String
+  paymentStatus String           @map("payment_status")
+  currency      String
+  subtotal      Float
+  tax           Float
+  discount      Float
+  total         Float
+  customer      Customer         @relation(fields: [customerId], references: [id])
+  items         SalesOrderItem[]
+  invoices      Invoice[]
+
+  @@map("sales_orders")
+}
+
+model SalesOrderItem {
+  id          String     @id
+  orderId     String     @map("order_id")
+  productId   String     @map("product_id")
+  productName String     @map("product_name")
+  sku         String
+  quantity    Int
+  unitPrice   Float      @map("unit_price")
+  total       Float
+  order       SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product    @relation(fields: [productId], references: [id])
+
+  @@map("sales_order_items")
+}
+
+model PurchaseOrder {
+  id                   String              @id
+  poNumber             String              @map("po_number")
+  supplierId           String              @map("supplier_id")
+  supplierName         String              @map("supplier_name")
+  orderDate            DateTime            @map("order_date") @db.Date
+  expectedDeliveryDate DateTime            @map("expected_delivery_date") @db.Date
+  status               String
+  subtotal             Float
+  tax                  Float
+  total                Float
+  supplier             Supplier            @relation(fields: [supplierId], references: [id])
+  items                PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String        @id
+  purchaseOrderId String        @map("purchase_order_id")
+  productId       String        @map("product_id")
+  productName     String        @map("product_name")
+  quantity        Int
+  unitCost        Float         @map("unit_cost")
+  total           Float
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id])
+
+  @@map("purchase_order_items")
+}
+
+model Invoice {
+  id            String     @id
+  invoiceNumber String     @map("invoice_number")
+  customerId    String     @map("customer_id")
+  customerName  String     @map("customer_name")
+  orderId       String     @map("order_id")
+  orderNumber   String     @map("order_number")
+  invoiceDate   DateTime   @map("invoice_date") @db.Date
+  dueDate       DateTime   @map("due_date") @db.Date
+  subtotal      Float
+  tax           Float
+  discount      Float
+  total         Float
+  amountPaid    Float      @map("amount_paid")
+  amountDue     Float      @map("amount_due")
+  status        String
+  customer      Customer   @relation(fields: [customerId], references: [id])
+  order         SalesOrder @relation(fields: [orderId], references: [id])
+
+  @@map("invoices")
+}
+
+model LeaveRequest {
+  id           String   @id
+  employeeId   String   @map("employee_id")
+  employeeName String   @map("employee_name")
+  leaveType    String   @map("leave_type")
+  startDate    DateTime @map("start_date") @db.Date
+  endDate      DateTime @map("end_date") @db.Date
+  days         Int
+  reason       String
+  status       String
+  approvedBy   String?  @map("approved_by")
+  employee     Employee @relation(fields: [employeeId], references: [id])
+
+  @@map("leave_requests")
+}
+
+model PayrollRecord {
+  id           String   @id
+  employeeId   String   @map("employee_id")
+  month        String
+  basicSalary  Float    @map("basic_salary")
+  allowances   Float
+  deductions   Float
+  grossSalary  Float    @map("gross_salary")
+  netSalary    Float    @map("net_salary")
+  status       String
+  employee     Employee @relation(fields: [employeeId], references: [id])
+
+  @@map("payroll_records")
+}
+
+model DashboardActivity {
+  id        String   @id
+  type      String
+  message   String
+  timestamp DateTime @db.Timestamptz(6)
+  actor     String
+
+  @@map("dashboard_activities")
+}
+
+/// Key/value store for org settings and seed markers (see lib/settings.ts).
+model AppMeta {
+  key   String @id
+  value String
+
+  @@map("app_meta")
+}

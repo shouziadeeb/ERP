@@ -1,3 +1,6 @@
+/**
+ * Employee list footer: "Showing X–Y of Z", numbered pages with ellipsis, go-to-page input.
+ */
 import { useState, type FormEvent } from 'react'
 import type { PaginationMeta } from '../../types/pagination'
 
@@ -109,7 +112,10 @@ function PageTextButton({
   )
 }
 
-/** e.g. 1  2  3  …  4040  4041 when near the start; adapts near middle and end */
+/**
+ * Builds page number buttons with ellipsis for large page counts.
+ * Example near start: 1, 2, 3, …, 4040, 4041
+ */
 export function buildPageItems(current: number, totalPages: number): Array<number | 'ellipsis'> {
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1)

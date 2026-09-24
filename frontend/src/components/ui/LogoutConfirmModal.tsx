@@ -1,3 +1,4 @@
+/** Confirms sign-out before clearing session (used from AppShell). */
 import { Icon } from '../Icon'
 
 interface LogoutConfirmModalProps {

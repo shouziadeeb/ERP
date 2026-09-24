@@ -1,3 +1,7 @@
+/**
+ * Builds the full in-memory ERP dataset before seed.ts writes batches to Postgres.
+ * Uses seeded randomness for names, orders, and ~101k employees.
+ */
 import departmentsData from './reference/departments.json' with { type: 'json' }
 import categoriesData from './reference/categories.json' with { type: 'json' }
 import warehousesData from './reference/warehouses.json' with { type: 'json' }

@@ -1,3 +1,4 @@
+/** Purchase order list and detail from /api/purchase-orders. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { PurchaseOrder } from '../types/order'
 

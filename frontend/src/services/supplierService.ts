@@ -1,3 +1,4 @@
+/** Supplier list and POST /api/suppliers. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { Supplier } from '../types/supplier'
 

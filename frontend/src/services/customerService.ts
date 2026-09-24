@@ -1,3 +1,4 @@
+/** Customer list and POST /api/customers. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { Customer } from '../types/customer'
 

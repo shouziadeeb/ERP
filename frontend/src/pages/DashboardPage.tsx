@@ -1,3 +1,4 @@
+/** Executive home: KPIs, charts, low stock, activity feed, leave approvals. */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DashboardPanel } from '../components/dashboard/DashboardPanel'

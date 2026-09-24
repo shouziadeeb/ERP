@@ -1,3 +1,4 @@
+/** Header global search (/api/search?q=). */
 import { fetchJson, toQuery } from '../lib/http'
 
 export interface SearchHit {

@@ -1,3 +1,4 @@
+/** Inventory rows: list and PATCH quantity/reserved levels. */
 import { fetchJson, toQuery, type PaginatedResult } from '../lib/http'
 import type { InventoryRecord, Warehouse } from '../types/inventory'
 import type { SortOrder } from '../types/pagination'

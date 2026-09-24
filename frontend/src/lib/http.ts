@@ -1,3 +1,6 @@
+/**
+ * Shared fetch wrapper: attaches Bearer token, handles 401 logout, builds query strings.
+ */
 import { apiUrl } from '../config/api'
 import { AUTH_STORAGE_KEY, AUTH_TOKEN_KEY } from '../constants/auth'
 import type { PaginatedResult } from '../types/pagination'
@@ -24,6 +27,7 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
     ...init,
   })
 
+  // Expired or invalid token on a protected route → clear session and show login.
   if (response.status === 401 && path !== '/api/auth/login') {
     sessionStorage.removeItem(AUTH_STORAGE_KEY)
     sessionStorage.removeItem(AUTH_TOKEN_KEY)

@@ -1,3 +1,4 @@
+/** GET/PATCH /api/settings; dispatches SETTINGS_UPDATED_EVENT for AppShell refresh. */
 import { fetchJson } from '../lib/http'
 
 export interface AppSettings {

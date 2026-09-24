@@ -1,3 +1,4 @@
+/** Warehouse stock levels and quantity adjustments via PATCH /api/inventory. */
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorBanner } from '../components/ui/ErrorBanner'

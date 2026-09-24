@@ -1,3 +1,7 @@
+/**
+ * Simple Bearer-token auth for demo/production MVP.
+ * Login compares env credentials; all other /api routes require matching Bearer token.
+ */
 import type { NextFunction, Request, Response } from 'express'
 
 const LOGIN_USER = process.env.APEX_LOGIN_USER ?? 'ADMIN'
@@ -5,6 +9,7 @@ const LOGIN_PASS = process.env.APEX_LOGIN_PASSWORD ?? 'admin1234'
 const API_TOKEN = process.env.APEX_API_TOKEN ?? 'apexerp-local-dev-token'
 
 export function loginHandler(req: Request, res: Response) {
+  // Usernames are case-insensitive (stored/compare as uppercase).
   const username = String(req.body.username ?? '').trim().toUpperCase()
   const password = String(req.body.password ?? '')
 

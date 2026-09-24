@@ -1,3 +1,6 @@
+/**
+ * Sign-in screen: password visibility toggle, cold-start hint, retries via authService.login.
+ */
 import { useState, type FormEvent } from 'react'
 import { Icon } from '../components/Icon'
 import { AUTH_STORAGE_KEY, AUTH_TOKEN_KEY } from '../constants/auth'

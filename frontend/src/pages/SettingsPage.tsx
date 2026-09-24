@@ -1,3 +1,4 @@
+/** Organization settings tabs; loads/saves via /api/settings (persisted in Postgres). */
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Icon } from '../components/Icon'
 import {

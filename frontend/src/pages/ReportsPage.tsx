@@ -1,3 +1,4 @@
+/** Multi-tab reports with filters, summary metrics, and CSV export (export=1). */
 import { useCallback, useEffect, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { StatusBadge } from '../components/ui/StatusBadge'

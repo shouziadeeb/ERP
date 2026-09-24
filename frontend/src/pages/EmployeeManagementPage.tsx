@@ -1,3 +1,6 @@
+/**
+ * HR module: paginated employee table (100k+), filters, CRUD drawers, delete confirm modal.
+ */
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { DeleteEmployeeModal } from '../components/employees/DeleteEmployeeModal'
 import { EmployeeDetailDrawer } from '../components/employees/EmployeeDetailDrawer'
@@ -74,6 +77,7 @@ export function EmployeeManagementPage() {
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  // Refetch when page or debounced filters change (search waits 300ms after typing).
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
