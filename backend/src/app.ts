@@ -8,6 +8,7 @@
 import type { Prisma } from '@prisma/client'
 import cors from 'cors'
 import express from 'express'
+import { performance } from 'node:perf_hooks'
 import { prisma } from './db/index.js'
 import { generateEmployeeAttendance } from './lib/attendance.js'
 import { listEmployees } from './lib/employeePagination.js'
@@ -104,20 +105,24 @@ export function createApp() {
 
   // --- Employees (large list uses dedicated pagination module) ---
   app.get('/api/employees', async (req, res, next) => {
+    const start = performance.now()
     try {
+      const dbStart = performance.now()
       const q = req.query as Record<string, unknown>
-      res.json(
-        await listEmployees({
-          page: Number(q.page) || 1,
-          limit: Number(q.limit) || 25,
-          search: String(q.search ?? ''),
-          departmentId: String(q.departmentId ?? 'all'),
-          status: String(q.status ?? 'all'),
-          country: String(q.country ?? 'all'),
-          sortBy: String(q.sortBy ?? 'fullName'),
-          sortOrder: String(q.sortOrder ?? 'asc') === 'desc' ? 'desc' : 'asc',
-        }),
-      )
+      const employees = await listEmployees({
+        page: Number(q.page) || 1,
+        limit: Number(q.limit) || 25,
+        search: String(q.search ?? ''),
+        departmentId: String(q.departmentId ?? 'all'),
+        status: String(q.status ?? 'all'),
+        country: String(q.country ?? 'all'),
+        sortBy: String(q.sortBy ?? 'fullName'),
+        sortOrder: String(q.sortOrder ?? 'asc') === 'desc' ? 'desc' : 'asc',
+      })
+      const dbTime = performance.now() - dbStart
+      console.log(`DB query: ${dbTime.toFixed(2)}ms`)
+      console.log(`Total /api/employees: ${(performance.now() - start).toFixed(2)}ms`)
+      res.json(employees)
     } catch (error) {
       next(error)
     }
